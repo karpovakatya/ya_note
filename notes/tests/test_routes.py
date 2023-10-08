@@ -46,8 +46,8 @@ class TestRoutes(TestCase):
 
     '''
     Проверяем редирект на страницу логина для анонимного пользователя
-    при попытке открыть страницу просмотра/удаления/редактирования заметки,
-    а также списка заметок.
+    при попытке открыть страницу создания/просмотра/удаления/редактирования
+    заметки, списка заметок.
     '''
     def test_redirect_for_anonymous_client(self):
         login_url = reverse('users:login')
@@ -55,6 +55,7 @@ class TestRoutes(TestCase):
         # Адреса, с которых редиректим:
         pages = (
             ('notes:list', None),  # просмотр списка заметок
+            ('notes:add', None),  # добавление заметки
             ('notes:detail', slug),  # просмотр заметки
             ('notes:edit', slug),  # редактирование заметки
             ('notes:delete', slug)  # удаление заметки
@@ -68,8 +69,9 @@ class TestRoutes(TestCase):
                 self.assertRedirects(response, redirect_url)
 
     '''
+    Пользователь авторизован.
     Проверяем доступность заметок для автора
-    и недоступность для залогиненного не-автора.
+    и недоступность для не-автора.
     '''
     def test_availability_for_author(self):
         users_statuses = (
