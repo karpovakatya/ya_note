@@ -29,7 +29,8 @@ class TestRoutes(TestCase):
             )
 
     '''
-    Проверяем доступность страниц для анонимных пользователей.
+    Анонимному пользователю доступны страницы:
+    главная, страницы регистрации, входа и выхода.
     '''
     def test_pages_availability(self):
         urls = ('notes:home',  # главная
@@ -45,33 +46,9 @@ class TestRoutes(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     '''
-    Проверяем редирект на страницу логина для анонимного пользователя
-    при попытке открыть страницу создания/просмотра/удаления/редактирования
-    заметки, списка заметок.
-    '''
-    def test_redirect_for_anonymous_client(self):
-        login_url = reverse('users:login')
-        slug = (self.note.slug,)
-        # Адреса, с которых редиректим:
-        pages = (
-            ('notes:list', None),  # просмотр списка заметок
-            ('notes:add', None),  # добавление заметки
-            ('notes:detail', slug),  # просмотр заметки
-            ('notes:edit', slug),  # редактирование заметки
-            ('notes:delete', slug)  # удаление заметки
-            )
-
-        for page, args in pages:
-            with self.subTest(page=page):
-                url = reverse(page, args=args)
-                redirect_url = f'{login_url}?next={url}'  # ОР
-                response = self.client.get(url)  # ФР
-                self.assertRedirects(response, redirect_url)
-
-    '''
     Пользователь авторизован.
     Проверяем доступность заметок для автора
-    и недоступность для не-автора.
+    и недоступность для не-автора (ошибка 404).
     '''
     def test_availability_for_author(self):
         users_statuses = (
@@ -92,3 +69,48 @@ class TestRoutes(TestCase):
                     url = reverse(page, args=(self.note.slug,))
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status)
+
+    '''
+    Проверяем редирект на страницу логина для анонимного пользователя
+    при попытке открыть страницу создания/просмотра/удаления/редактирования
+    заметки, списка заметок.
+    '''
+    def test_redirect_for_anonymous_client(self):
+        login_url = reverse('users:login')
+        slug = (self.note.slug,)
+        # Адреса, с которых редиректим:
+        pages = (
+            ('notes:list', None),  # просмотр списка заметок
+            ('notes:add', None),  # добавление заметки
+            ('notes:success', None),  # страница успешного добавления записи
+            ('notes:detail', slug),  # просмотр заметки
+            ('notes:edit', slug),  # редактирование заметки
+            ('notes:delete', slug)  # удаление заметки
+            )
+
+        for page, args in pages:
+            with self.subTest(page=page):
+                url = reverse(page, args=args)
+                redirect_url = f'{login_url}?next={url}'  # ОР
+                response = self.client.get(url)  # ФР
+                self.assertRedirects(response, redirect_url)
+
+    def test_pages_availability_for_auth_user(self):
+        """Аутентифицированному пользователю доступна:
+
+        страница со списком заметок notes/,
+        страница добавления новой заметки add/,
+        страница успешного добавления заметки done/."""
+
+        urls = ('notes:list',
+                'notes:add',
+                'notes:success'
+                )
+
+        self.client.force_login(self.author)
+
+        for page in urls:
+            with self.subTest(page=page):
+                url = reverse(page)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
