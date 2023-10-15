@@ -48,7 +48,7 @@ class TestNotesList(TestCase):
         object_list = response.context['object_list']
         # Получаем id заметок в том порядке, как они выведены на странице.
         note_idx = [note.id for note in object_list]
-        sorted_idx = list(range(1, len(note_idx)+1))
+        sorted_idx = sorted(note_idx)
         # Проверяем, что исходный список был отсортирован правильно.
         self.assertEqual(note_idx, sorted_idx)
 
