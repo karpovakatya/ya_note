@@ -92,7 +92,7 @@ class TestNoteSlugValidation(TestCase):
             )
 
     '''
-    Нельзя создать заметку с существующим слагом.
+    Невозможно создать две заметки с одинаковым slug
     '''
     def test_user_cant_use_existing_slug(self):
         # Отправляем запрос через авторизованный клиент.

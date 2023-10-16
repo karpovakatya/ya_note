@@ -76,3 +76,13 @@ class TestCreateNote(TestCase):
         self.client.force_login(self.author)
         response = self.client.get(self.add_url)
         self.assertIn('form', response.context)
+
+
+'''
+отдельная заметка передаётся на страницу со списком заметок 
+в списке object_list, в словаре context;
+'''
+
+'''
+в список заметок одного пользователя не попадают заметки другого пользователя
+'''

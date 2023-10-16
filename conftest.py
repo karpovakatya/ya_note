@@ -21,7 +21,7 @@ def author_client(author, client):  # Вызываем фикстуру авто
 @pytest.fixture
 def note(author):
     """Создаем объект заметки Автора"""
-    note = Note.objects.create( 
+    note = Note.objects.create(
         title='Заголовок',
         text='Текст заметки',
         slug='note-slug',
@@ -36,3 +36,13 @@ def slug_for_args(note):
     # И возвращает кортеж, который содержит slug заметки.
     # На то, что это кортеж, указывает запятая в конце выражения.
     return note.slug,
+
+
+@pytest.fixture
+# Добавляем фикстуру form_data
+def form_data():
+    return {
+        'title': 'Новый заголовок',
+        'text': 'Новый текст',
+        'slug': 'new-slug'
+    }
